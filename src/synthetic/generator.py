@@ -8,6 +8,8 @@ import logging
 import sys
 from pathlib import Path
 
+from .errors import SyntheticError
+
 logger = logging.getLogger("peta_arah_minat")
 
 _LAZY_EXPORTS = {
@@ -84,6 +86,9 @@ def main() -> None:
         sys.exit(asyncio.run(main_async()))
     except KeyboardInterrupt:
         logger.warning("Cancelled by user.")
+        sys.exit(1)
+    except SyntheticError as exc:
+        logger.error("Run aborted: %s", exc)
         sys.exit(1)
     except OSError as exc:
         logger.error(str(exc))

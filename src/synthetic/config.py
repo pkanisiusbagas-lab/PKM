@@ -122,7 +122,7 @@ def load_config(argv: Sequence[str] | None = None) -> Config:
         base_url=_cli_or_env(None, "ZEN_BASE_URL", str, "https://opencode.ai/zen/v1"),
         persona_model=_cli_or_env(None, "ZEN_MODEL_PERSONA", str, "big-pickle"),
         respondent_model=_cli_or_env(
-            None, "ZEN_MODEL_RESPONDENT", str, "deepseek-v4-flash-free"
+            None, "ZEN_MODEL_RESPONDENT", str, "big-pickle"
         ),
         num_samples=_cli_or_env(args.samples, "NUM_SAMPLES", int, 2000),
         concurrency=_cli_or_env(args.concurrency, "CONCURRENCY", int, 8),

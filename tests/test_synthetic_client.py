@@ -320,6 +320,18 @@ def test_request_content_forwards_max_tokens():
     assert seen["max_tokens"] == 1024
 
 
+def test_session_id_defaults_to_stable_ses():
+    client = make_client(SleepRecorder())
+    assert client.session_id.startswith("ses_")
+    assert len(client.session_id) == 20
+
+
+def test_custom_session_id_respected():
+    config = ZenClientConfig(api_key="k", base_url="http://x", session_id="ses_custom")
+    client = ZenClient(config, sleep=SleepRecorder(), rng=random.Random(0))
+    assert client.session_id == "ses_custom"
+
+
 def test_lifecycle_close_idempotent_and_context_manager():
     sleep = SleepRecorder()
     client = make_client(sleep)
