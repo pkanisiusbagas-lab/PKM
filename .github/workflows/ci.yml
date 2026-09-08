@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Lint
+        run: uvx ruff check src/ tests/ configs/
+
+      - name: Test with coverage
+        run: uv run coverage run -m pytest tests/ -q
+
+      - name: Coverage gates
+        run: |
+          uv run coverage report --include="src/synthetic/client.py" --fail-under=85
+          uv run coverage report --include="src/synthetic/config.py" --fail-under=90
+          uv run coverage report --include="src/synthetic/errors.py" --fail-under=90
+          uv run coverage report --include="src/synthetic/pipeline.py" --fail-under=85
+          uv run coverage report --include="src/synthetic/prompts.py" --fail-under=90
+          uv run coverage report --include="src/synthetic/questionnaire.py" --fail-under=85
+          uv run coverage report --include="src/synthetic/validation.py" --fail-under=90

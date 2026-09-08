@@ -1,0 +1,38 @@
+[project]
+name = "pkm"
+version = "0.1.0"
+description = "PKM ensemble learning template"
+readme = "docs/soal.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=6",
+    "jupyter>=1",
+    "lightgbm>=4",
+    "matplotlib>=3",
+    "numpy>=2",
+    "openai>=3.8.0,<4",
+    "pandas>=2",
+    "python-dotenv>=1.2.3",
+    "scikit-learn>=1",
+    "seaborn>=0.13",
+    "tqdm>=4.70.0",
+    "xgboost>=2",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.0",
+    "pytest>=8",
+    "ruff>=0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+# F822: generator.py uses PEP 562 lazy re-exports; names resolve via __getattr__.
+"src/synthetic/generator.py" = ["F822"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
