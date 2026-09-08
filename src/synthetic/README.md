@@ -6,7 +6,24 @@ Generator dataset sintetis kuesioner minat (16 soal: 14 pilihan ganda, 1 slider,
 
 1. Install dependencies: `uv sync`
 2. Salin `.env.example` menjadi `.env` lalu isi `OPENCODE_API_KEY`.
-3. **Pastikan model yang dipakai bisa diakses key-mu.** Model free-tier (`*-free`, `big-pickle`) diblokir untuk pemanggilan API mentah (`400 MissingSessionID`). Kalau kena error itu, ganti `ZEN_MODEL_PERSONA` / `ZEN_MODEL_RESPONDENT` di `.env` ke model yang accessible.
+3. **Pilih model dari daftar free yang tersedia.** Salin ID persis seperti di picker (bagian `(via proxy · <id>)`):
+
+| Tampil di picker | ID untuk `.env` | Saran peran |
+|---|---|---|
+| Big Pickle (free) | `big-pickle` | Persona (kreatif) |
+| Ling 3.0 Flash Fin Free (free) | `ling-3.0-flash-fin-free` | Responden (cepat, patuh instruksi) |
+| MiMo V2.5 Free (free) | `mimo-v2.5-free` | Persona atau responden |
+| Nemotron 3 Ultra Free (free) | `nemotron-3-ultra-free` | Persona (model besar) |
+| Nemotron 3.5 Lightning Free (free) | `nemotron-3.5-lightning-free` | Responden (cepat) |
+
+Contoh `.env`:
+
+```
+ZEN_MODEL_PERSONA=mimo-v2.5-free
+ZEN_MODEL_RESPONDENT=ling-3.0-flash-fin-free
+```
+
+Catatan: kalau ID di atas ditolak (`400 MissingSessionID`), cek lagi ID persisnya di picker — yang berlaku ID dalam tanda kurung, bukan nama display. Selalu verifikasi 1 sampel dulu (lihat Cara Run).
 
 ## Cara Run
 
@@ -46,7 +63,7 @@ Run yang putus bisa dilanjut dengan perintah yang **sama persis (termasuk `--see
 | `OPENCODE_API_KEY` | wajib | API key |
 | `ZEN_BASE_URL` | `https://opencode.ai/zen/v1` | Endpoint OpenAI-compatible |
 | `ZEN_MODEL_PERSONA` | `big-pickle` | Model agen persona |
-| `ZEN_MODEL_RESPONDENT` | `deepseek-v4-flash-free` | Model agen responden |
+| `ZEN_MODEL_RESPONDENT` | `deepseek-v4-flash-free` | Model agen responden (disarankan ganti ke tabel di atas) |
 | `NUM_SAMPLES` | `2000` | Jumlah sampel (maks 100.000) |
 | `CONCURRENCY` | `8` | Request paralel (maks 64) |
 | `TEMPERATURE` | `1.1` | Temperature sampling |
