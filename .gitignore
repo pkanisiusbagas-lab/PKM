@@ -6,3 +6,9 @@ __pycache__/
 .coverage
 .coverage.*
 coverage.xml
+.pytest_cache/
+.ruff_cache/
+
+# generated datasets (reproducible via CLI; folders kept via .gitkeep)
+*.jsonl
+data/synthetic/generated/dataset.csv
