@@ -14,6 +14,7 @@ import asyncio
 import logging
 import math
 import random
+import uuid
 from dataclasses import dataclass, field
 from types import TracebackType
 from typing import Self
@@ -84,6 +85,7 @@ class ZenClientConfig:
     timeout_seconds: float = 60.0
     retry_policy: RetryPolicy = field(default_factory=RetryPolicy)
     max_tokens: int | None = 1024
+    session_id: str | None = None
 
     def __post_init__(self) -> None:
         if not self.api_key:
@@ -142,11 +144,15 @@ class ZenClient:
         self._max_tokens = config.max_tokens
         self._sleep = sleep
         self._rng = rng if rng is not None else random.Random()
+        # Free-tier gateway recognizes calls by session; one stable id per
+        # client keeps all retries of a run on the same identity.
+        self.session_id = config.session_id or f"ses_{uuid.uuid4().hex[:16]}"
         self._client = AsyncOpenAI(
             api_key=config.api_key,
             base_url=config.base_url,
             max_retries=_SDK_MAX_RETRIES,
             timeout=config.timeout_seconds,
+            default_headers={"x-opencode-session": self.session_id},
         )
         self._closed = False
 

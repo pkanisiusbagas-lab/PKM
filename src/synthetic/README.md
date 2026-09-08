@@ -63,7 +63,7 @@ Run yang putus bisa dilanjut dengan perintah yang **sama persis (termasuk `--see
 | `OPENCODE_API_KEY` | wajib | API key |
 | `ZEN_BASE_URL` | `https://opencode.ai/zen/v1` | Endpoint OpenAI-compatible |
 | `ZEN_MODEL_PERSONA` | `big-pickle` | Model agen persona |
-| `ZEN_MODEL_RESPONDENT` | `deepseek-v4-flash-free` | Model agen responden (disarankan ganti ke tabel di atas) |
+| `ZEN_MODEL_RESPONDENT` | `big-pickle` | Model agen responden |
 | `NUM_SAMPLES` | `2000` | Jumlah sampel (maks 100.000) |
 | `CONCURRENCY` | `8` | Request paralel (maks 64) |
 | `TEMPERATURE` | `1.1` | Temperature sampling |

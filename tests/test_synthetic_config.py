@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 
+import src.synthetic.config as config_mod
 from src.synthetic.config import (
     MAX_CONCURRENCY,
     MAX_SAMPLES,
@@ -37,6 +38,8 @@ def clean_env(monkeypatch):
     for var in _MANAGED_VARS:
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("OPENCODE_API_KEY", "test-key")
+    # Neutralize dotenv: a real .env on disk must not leak into tests.
+    monkeypatch.setattr(config_mod, "load_dotenv", lambda *args, **kwargs: False)
     return monkeypatch
 
 
