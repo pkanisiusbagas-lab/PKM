@@ -6,6 +6,8 @@ Environment is fully isolated per test via the clean_env fixture.
 
 from __future__ import annotations
 
+import logging
+
 import pytest
 
 import src.synthetic.config as config_mod
@@ -30,6 +32,7 @@ _MANAGED_VARS = (
     "RESUME",
     "MAX_FAILURE_RATE",
     "GATE_WARMUP",
+    "LOG_FILE",
 )
 
 
@@ -126,6 +129,21 @@ def test_missing_api_key_raises(clean_env, monkeypatch):
 def test_setup_logging_is_repeatable():
     setup_logging()
     setup_logging()
+
+
+def test_setup_logging_writes_file(clean_env, tmp_path):
+    log_file = tmp_path / "nested" / "run.log"
+    clean_env.setenv("LOG_FILE", str(log_file))
+    setup_logging()
+    logging.getLogger("test-log-file").warning("hello-file")
+    for handler in logging.root.handlers:
+        handler.flush()
+    assert "hello-file" in log_file.read_text(encoding="utf-8")
+
+
+def test_setup_logging_without_file(clean_env):
+    setup_logging()
+    assert not any(isinstance(h, logging.FileHandler) for h in logging.root.handlers)
 
 
 def test_seed_defaults_to_none(clean_env):

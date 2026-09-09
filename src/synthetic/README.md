@@ -73,6 +73,7 @@ Run yang putus bisa dilanjut dengan perintah yang **sama persis (termasuk `--see
 | `MAX_FAILURE_RATE` | `0.5` | Batas abort (0–1) |
 | `GATE_WARMUP` | `10` | Sampel sebelum gate aktif |
 | `LOG_LEVEL` | `INFO` | Level log |
+| `LOG_FILE` | kosong | Kalau diisi, log juga ditulis ke file (folder dibuat otomatis) |
 
 ## Output
 

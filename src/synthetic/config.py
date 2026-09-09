@@ -12,6 +12,7 @@ import math
 import os
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -136,11 +137,21 @@ def load_config(argv: Sequence[str] | None = None) -> Config:
 
 
 def setup_logging() -> None:
-    """Configure root logging. Safe to call multiple times."""
+    """Configure root logging. Safe to call multiple times.
+
+    Set LOG_FILE to also tee logs to a file (parent dirs auto-created).
+    """
     level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+    handlers: list[logging.Handler] = [logging.StreamHandler()]
+    log_file = os.getenv("LOG_FILE")
+    if log_file:
+        path = Path(log_file)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        handlers.append(logging.FileHandler(path, encoding="utf-8"))
     logging.basicConfig(
         level=getattr(logging, level_name, logging.INFO),
         format="%(asctime)s | %(levelname)-8s | %(message)s",
         datefmt="%H:%M:%S",
+        handlers=handlers,
         force=True,
     )
