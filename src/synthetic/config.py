@@ -1,7 +1,8 @@
 """Synthetic generation configuration: CLI flags, environment, defaults.
 
 Precedence (highest first): CLI flag > environment variable > built-in default.
-Requires OPENCODE_API_KEY in the environment (or a .env file).
+Requires the active provider's key (see ProviderPreset.key_env) in the
+environment (or a .env file).
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+from .providers import resolve_provider
 
 # Cost/operational guardrails: typos here bill real money or hammer the API.
 MAX_SAMPLES = 100_000
@@ -37,6 +40,7 @@ class Config:
     resume: bool = True
     max_failure_rate: float = 0.5
     gate_warmup: int = 10
+    provider: str = "zen"
 
     def __post_init__(self) -> None:
         if not self.api_key:
@@ -55,6 +59,9 @@ class Config:
             raise ValueError("temperature must be finite.")
         if not self.output_path:
             raise ValueError("output_path must not be empty.")
+        if not isinstance(self.provider, str) or not self.provider.strip():
+            raise ValueError("provider must be a non-empty string.")
+        resolve_provider(self.provider)
         if not 0 <= self.max_failure_rate <= 1:
             raise ValueError("max_failure_rate must be between 0 and 1.")
         if self.gate_warmup < 1:
@@ -92,7 +99,7 @@ def load_config(argv: Sequence[str] | None = None) -> Config:
     """Load configuration from CLI flags, environment, and defaults.
 
     `argv` is injectable for tests; pass None to read sys.argv.
-    Raises OSError if OPENCODE_API_KEY is missing.
+    Raises OSError if the provider key env var is missing.
     """
     load_dotenv()
     parser = argparse.ArgumentParser(
@@ -109,27 +116,39 @@ def load_config(argv: Sequence[str] | None = None) -> Config:
                         help="Abort when failure rate exceeds this (0-1)")
     parser.add_argument("--gate-warmup", type=int, default=None,
                         help="Samples completed before the failure gate arms")
+    parser.add_argument("--provider", type=str, default=None,
+                        help="LLM provider: zen, gemini, groq, huggingface, tokenrouter")
     args = parser.parse_args(argv)
 
-    api_key = os.getenv("OPENCODE_API_KEY")
+    preset = resolve_provider(_cli_or_env(args.provider, "PROVIDER", str, "zen"))
+    prefix = preset.env_prefix
+    api_key = os.getenv(preset.key_env)
     if not api_key:
         raise OSError(
-            "OPENCODE_API_KEY is not set. Copy .env.example to .env and fill in your API key "
-            "(free signup at https://opencode.ai/auth)."
+            f"{preset.key_env} is not set. {preset.where_to_get_key} "
+            "Copy .env.example to .env and fill it in."
         )
 
     return Config(
         api_key=api_key,
-        base_url=_cli_or_env(None, "ZEN_BASE_URL", str, "https://opencode.ai/zen/v1"),
-        persona_model=_cli_or_env(None, "ZEN_MODEL_PERSONA", str, "big-pickle"),
+        base_url=_cli_or_env(
+            None, f"{prefix}_BASE_URL", str,
+            _cli_or_env(None, "ZEN_BASE_URL", str, preset.base_url),
+        ),
+        persona_model=_cli_or_env(
+            None, f"{prefix}_PERSONA_MODEL", str,
+            _cli_or_env(None, "ZEN_MODEL_PERSONA", str, preset.persona_model),
+        ),
         respondent_model=_cli_or_env(
-            None, "ZEN_MODEL_RESPONDENT", str, "big-pickle"
+            None, f"{prefix}_RESPONDENT_MODEL", str,
+            _cli_or_env(None, "ZEN_MODEL_RESPONDENT", str, preset.respondent_model),
         ),
         num_samples=_cli_or_env(args.samples, "NUM_SAMPLES", int, 2000),
         concurrency=_cli_or_env(args.concurrency, "CONCURRENCY", int, 8),
         temperature=_cli_or_env(args.temperature, "TEMPERATURE", float, 1.1),
         output_path=_cli_or_env(args.output, "OUTPUT_PATH", str, "dataset/peta_arah_minat.jsonl"),
         seed=_cli_or_env(args.seed, "SEED", int, None),
+        provider=preset.name,
         resume=_cli_or_env(args.resume, "RESUME", _parse_bool, True),
         max_failure_rate=_cli_or_env(args.max_failure_rate, "MAX_FAILURE_RATE", float, 0.5),
         gate_warmup=_cli_or_env(args.gate_warmup, "GATE_WARMUP", int, 10),

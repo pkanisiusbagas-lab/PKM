@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .errors import SyntheticError
 
-logger = logging.getLogger("peta_arah_minat")
+logger = logging.getLogger(__name__)
 
 _LAZY_EXPORTS = {
     "CONFIDENCE_LEVELS": ".pools",
@@ -25,7 +25,9 @@ _LAZY_EXPORTS = {
     "LLMResponseError": ".errors",
     "MalformedResponseError": ".errors",
     "PERSONALITY_TRAITS": ".pools",
+    "PROVIDER_PRESETS": ".providers",
     "PersonaRecord": ".types",
+    "ProviderPreset": ".providers",
     "QUESTIONNAIRE": ".questionnaire",
     "Question": ".questionnaire",
     "QuestionOption": ".questionnaire",
@@ -45,6 +47,7 @@ _LAZY_EXPORTS = {
     "is_retryable_error": ".client",
     "load_config": ".config",
     "render_questionnaire": ".prompts",
+    "resolve_provider": ".providers",
     "run_pipeline": ".pipeline",
     "setup_logging": ".config",
     "validate_answers": ".validation",
@@ -100,6 +103,7 @@ __all__ = [
     "INDONESIAN_CITIES",
     "LEANING_CATEGORIES",
     "PERSONALITY_TRAITS",
+    "PROVIDER_PRESETS",
     "QUESTIONNAIRE",
     "ChatMessage",
     "Config",
@@ -110,6 +114,7 @@ __all__ = [
     "LLMResponseError",
     "MalformedResponseError",
     "PersonaRecord",
+    "ProviderPreset",
     "Question",
     "QuestionOption",
     "RetryExhaustedError",
@@ -130,6 +135,7 @@ __all__ = [
     "main",
     "main_async",
     "render_questionnaire",
+    "resolve_provider",
     "run_pipeline",
     "setup_logging",
     "validate_answers",

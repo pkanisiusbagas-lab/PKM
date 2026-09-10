@@ -60,7 +60,8 @@ Run yang putus bisa dilanjut dengan perintah yang **sama persis (termasuk `--see
 
 | Variabel | Default | Keterangan |
 |---|---|---|
-| `OPENCODE_API_KEY` | wajib | API key |
+| `OPENCODE_API_KEY` | wajib* | API key (*atau key provider aktif, lihat Ganti Provider) |
+| `PROVIDER` | `zen` | `zen` \| `gemini` \| `groq` \| `huggingface` \| `tokenrouter` |
 | `ZEN_BASE_URL` | `https://opencode.ai/zen/v1` | Endpoint OpenAI-compatible |
 | `ZEN_MODEL_PERSONA` | `big-pickle` | Model agen persona |
 | `ZEN_MODEL_RESPONDENT` | `big-pickle` | Model agen responden |
@@ -74,6 +75,25 @@ Run yang putus bisa dilanjut dengan perintah yang **sama persis (termasuk `--see
 | `GATE_WARMUP` | `10` | Sampel sebelum gate aktif |
 | `LOG_LEVEL` | `INFO` | Level log |
 | `LOG_FILE` | kosong | Kalau diisi, log juga ditulis ke file (folder dibuat otomatis) |
+
+## Ganti Provider
+
+Client generik (endpoint OpenAI-compatible apa pun) — ganti provider tanpa ubah kode:
+
+```
+PROVIDER=groq
+GROQ_API_KEY=<key-dari-console.groq.com>
+```
+
+| Provider | Key | Model default |
+|---|---|---|
+| `zen` | `OPENCODE_API_KEY` | big-pickle / big-pickle |
+| `gemini` | `GEMINI_API_KEY` (Google AI Studio, free tier) | gemini-2.0-flash |
+| `groq` | `GROQ_API_KEY` (console.groq.com, free 30 RPM) | openai/gpt-oss-20b |
+| `huggingface` | `HF_TOKEN` (token + izin Inference Providers) | openai/gpt-oss-20b:fastest |
+| `tokenrouter` | `TOKENROUTER_API_KEY` (console tokenrouter.com) | z-ai/glm-5.3-free (free) |
+
+`ZEN_BASE_URL` / `ZEN_MODEL_PERSONA` / `ZEN_MODEL_RESPONDENT` tetap bisa override default preset. Untuk override khusus satu provider, pakai prefix-nya (`{PREFIX}_BASE_URL`, `{PREFIX}_PERSONA_MODEL`, `{PREFIX}_RESPONDENT_MODEL` — contoh: `TOKENROUTER_BASE_URL`). Urutan baca tetap: CLI > env spesifik provider > env `ZEN_*` > default preset. Flag CLI: `--provider`.
 
 ## Output
 

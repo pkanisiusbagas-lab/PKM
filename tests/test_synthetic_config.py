@@ -33,6 +33,7 @@ _MANAGED_VARS = (
     "MAX_FAILURE_RATE",
     "GATE_WARMUP",
     "LOG_FILE",
+    "PROVIDER",
 )
 
 

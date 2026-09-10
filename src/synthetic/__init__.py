@@ -29,6 +29,7 @@ from .prompts import (
     build_respondent_prompt,
     render_questionnaire,
 )
+from .providers import PROVIDER_PRESETS, ProviderPreset, resolve_provider
 from .questionnaire import QUESTIONNAIRE, Question, QuestionOption
 from .response import SurveyResponse
 from .types import ChatMessage, FailureCategory, JsonObject, PersonaRecord
@@ -39,6 +40,7 @@ __all__ = [
     "INDONESIAN_CITIES",
     "LEANING_CATEGORIES",
     "PERSONALITY_TRAITS",
+    "PROVIDER_PRESETS",
     "QUESTIONNAIRE",
     "ChatMessage",
     "Config",
@@ -49,6 +51,7 @@ __all__ = [
     "LLMResponseError",
     "MalformedResponseError",
     "PersonaRecord",
+    "ProviderPreset",
     "Question",
     "QuestionOption",
     "RetryExhaustedError",
@@ -67,6 +70,7 @@ __all__ = [
     "is_retryable_error",
     "load_config",
     "render_questionnaire",
+    "resolve_provider",
     "run_pipeline",
     "setup_logging",
     "validate_answers",
