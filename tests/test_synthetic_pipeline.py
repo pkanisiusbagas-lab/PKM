@@ -166,6 +166,21 @@ def test_run_pipeline_resumes_existing_rows(monkeypatch, tmp_path):
     assert len(out.read_text(encoding="utf-8").splitlines()) == 3
 
 
+def test_resume_ignores_blank_lines(monkeypatch, tmp_path):
+    out = tmp_path / "d.jsonl"
+    out.write_text(json.dumps({"respondent_id": "old"}) + "\n\n", encoding="utf-8")
+    calls = {"n": 0}
+
+    async def fake_with_retry(client, idx, leaning, *args, **kwargs):
+        calls["n"] += 1
+        return _response(idx)
+
+    monkeypatch.setattr(pipeline_mod, "generate_one_sample_with_retry", fake_with_retry)
+    results = run(run_pipeline(_config(out, seed=7, gate_warmup=100)))
+    assert calls["n"] == 2  # trailing blank line is not a completed row.
+    assert len(results) == 2
+
+
 def test_run_pipeline_failure_gate_aborts(monkeypatch, tmp_path):
     out = tmp_path / "d.jsonl"
 

@@ -33,7 +33,14 @@ from .response import SurveyResponse
 from .types import JsonObject, PersonaRecord
 from .validation import validate_answers
 
-logger = logging.getLogger("peta_arah_minat")
+logger = logging.getLogger(__name__)
+
+# Sampling tuning for generate_one_sample.
+SAMPLING_TEMP_MIN = 0.1
+SAMPLING_TEMP_MAX = 2.0
+SAMPLING_TEMP_JITTER = 0.15
+SAMPLING_SEED_MIN = 100_000
+SAMPLING_SEED_MAX = 999_999
 
 # Cell prefixes that turn CSV text into live spreadsheet formulas.
 _CSV_UNSAFE_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
@@ -83,8 +90,11 @@ async def generate_one_sample(
     personality = r.choice(PERSONALITY_TRAITS)
     confidence = r.choice(CONFIDENCE_LEVELS)
     city = r.choice(INDONESIAN_CITIES)
-    seed = r.randint(100_000, 999_999)
-    temperature = max(0.1, min(2.0, base_temperature + r.uniform(-0.15, 0.15)))
+    seed = r.randint(SAMPLING_SEED_MIN, SAMPLING_SEED_MAX)
+    temperature = max(
+        SAMPLING_TEMP_MIN,
+        min(SAMPLING_TEMP_MAX, base_temperature + r.uniform(-SAMPLING_TEMP_JITTER, SAMPLING_TEMP_JITTER)),
+    )
 
     persona_raw = await client.chat_json(
         model=persona_model,
@@ -164,7 +174,7 @@ def export_csv(samples: list[SurveyResponse], csv_path: Path) -> None:
 
 def _count_jsonl_lines(path: Path) -> int:
     with path.open("r", encoding="utf-8") as f:
-        return sum(1 for _ in f)
+        return sum(1 for line in f if line.strip())
 
 
 async def run_pipeline(config: Config) -> list[SurveyResponse]:
